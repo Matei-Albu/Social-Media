@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Response, status, HTTPException
+from fastapi import FastAPI, Response, status, HTTPException, Depends
 from fastapi.params import Body
 from pydantic import BaseModel
 from typing import Optional
@@ -8,6 +8,11 @@ from psycopg2.extras import RealDictCursor
 import time
 import os
 from dotenv import load_dotenv
+from . import models
+from .database import engine, get_db
+from sqlalchemy.orm import Session
+
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
@@ -54,6 +59,10 @@ def find_index_post(id):
 @app.get("/")
 async def root():
     return "root"
+
+@app.get("/sqlalchemy")
+async def test_post(db: Session = Depends(get_db)):
+    return{"status": "success"}
 
 @app.get("/posts")
 async def get_posts():
