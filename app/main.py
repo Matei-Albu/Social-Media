@@ -121,3 +121,12 @@ async def update_post(id:int, updated_post: schemas.PostCreate, db: Session = De
     db.commit()
 
     return post_query.first()
+
+@app.post("/users", status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
+async def create_user(user: schemas.UserCreate , db:Session = Depends(get_db)):
+    new_user = models.User(**user.dict())
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    return new_user
